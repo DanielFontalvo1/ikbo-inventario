@@ -43,4 +43,35 @@ public class ProductoInventarioController {
         return ResponseEntity.ok(this.productoInventarioService.listarProductoInventario(nombreProducto, page));
     }
 
+    @PostMapping("/actualizar-producto-invetario")
+    public ResponseEntity<?> actualizarProductoInvetario(@RequestBody ProductoInventarioDto productoInventario){
+        Map<String, Object> responseError = new HashMap<>();
+        ResponseDto response = new ResponseDto();
+
+        try{
+            response = this.productoInventarioService.actualizarProductoInventario(productoInventario);
+        }catch (Exception e){
+            responseError.put("mensaje", "Error al insertar en la base de datos");
+            responseError.put("error", e.getMessage());
+            return new ResponseEntity<Map<String, Object>>(responseError, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/inactivar-producto-inventario")
+    public ResponseEntity<?> inactivarProductoInvetario(@RequestBody ProductoInventarioDto productoInventario){
+        Map<String, Object> responseError = new HashMap<>();
+        ResponseDto response = new ResponseDto();
+
+        try{
+            response = this.productoInventarioService.inactivarProductoEnInventario(productoInventario);
+        }catch (Exception e){
+            responseError.put("mensaje", "Error al insertar en la base de datos");
+            responseError.put("error", e.getMessage());
+            return new ResponseEntity<Map<String, Object>>(responseError, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return ResponseEntity.ok(response);
+    }
 }

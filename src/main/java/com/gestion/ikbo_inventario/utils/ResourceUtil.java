@@ -15,6 +15,9 @@ public class ResourceUtil {
     public static final String notFechaCaducaProductoInventario = "Fecha de caducidad invalidad";
     public static final String notCantidadProductoInventario ="La cantidad del producto debe ser mayor a cero";
     public static final String productoInventarioExit = "Producto guardado en el inventario exitosamente";
+    public static final String productoInvetarioUpdate = "Producto en invetario actualizado exitosamente";
+    public static final String productoNotFound = "Producto no existe";
+    public static final String productoInvetarioInactivo ="Producto en invetario inactivado";
 
     public static Date obtenerFechaActual() throws ParseException {
         SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");

@@ -11,7 +11,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface ProductoDao extends CrudRepository<Producto, Integer>, PagingAndSortingRepository<Producto, Integer> {
 
 
-    @Query("select p from Producto p where p.idProducto = ?1 or p.nombreProducto = ?2")
+    @Query("select p from Producto p where (p.idProducto = ?1 or p.nombreProducto = ?2) and p.estado.idEstado = 1")
     Producto getProductoByIdProductoOrNombreProducto(int idproducto, String nombreProducto);
 
     @Query(value= """
@@ -19,6 +19,7 @@ public interface ProductoDao extends CrudRepository<Producto, Integer>, PagingAn
          FROM Producto  p
        WHERE ( 0 = ?1  or p.idProducto = ?1)
          and ('%'= ?2 or p.nombreProducto like concat('%',?2,'%'))
+         and p.estado.idEstado = 1
     """)
     Page<Producto> getAllByIdProductoAndNombreProducto(int idProducto, String nombreProducto, Pageable pageable);
 }

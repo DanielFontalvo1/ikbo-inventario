@@ -30,7 +30,7 @@ public class ProductoInventarioServiceImpl implements ProductoInventarioService 
     public ResponseDto guardarProductoInventario(ProductoInventarioDto productoInventario) {
         ResponseDto response = null;
 
-        response = this.validarDtoGuardado(productoInventario);
+        response = this.validarDtoGuardado(productoInventario, 1);
 
         if (response != null) {
             return response;
@@ -63,7 +63,69 @@ public class ProductoInventarioServiceImpl implements ProductoInventarioService 
         return this.productoInventarioDao.listarProductosInventario(nombreProducto==null?"%":nombreProducto, page);
     }
 
-    public ResponseDto validarDtoGuardado(ProductoInventarioDto productoInventario){
+    @Override
+    public ResponseDto actualizarProductoInventario(ProductoInventarioDto productoInventario) {
+
+        ResponseDto response = null;
+        ProductoInventario productoI = this.productoInventarioDao
+                .getProductoInventarioByProducto_IdProductoAndConsecutivo(productoInventario.getIdProducto(), productoInventario.getConsecutivo());
+
+        if(productoI==null){
+            response = new ResponseDto();
+            response.setRespuesta(ResourceUtil.productoNotFound);
+            response.setValor(0);
+        }
+
+        response = this.validarDtoGuardado(productoInventario, 2);
+
+        if(response != null){
+            return response;
+        }
+
+        productoI.setFechaCaduca(ResourceUtil.convertitFechaStringaDate(productoInventario.getFechaCaduca()));
+        productoI.setCantidad(productoInventario.getCantidad());
+
+        if(productoInventario.getCantidad() == 0 ){
+            Estado estado = new Estado();
+            estado.setIdEstado(2);
+            productoI.setEstado(estado);
+        }
+
+        this.productoInventarioDao.save(productoI);
+
+        response = new ResponseDto();
+        response.setRespuesta(ResourceUtil.productoInvetarioUpdate);
+        response.setValor(productoI.getConsecutivo());
+
+        return response;
+    }
+
+    @Override
+    public ResponseDto inactivarProductoEnInventario(ProductoInventarioDto productoInventario) {
+        ResponseDto response = null;
+        ProductoInventario productoI = this.productoInventarioDao
+                .getProductoInventarioByProducto_IdProductoAndConsecutivo(productoInventario.getIdProducto(), productoInventario.getConsecutivo());
+
+        if(productoI==null){
+            response = new ResponseDto();
+            response.setRespuesta(ResourceUtil.productoNotFound);
+            response.setValor(0);
+        }
+
+        Estado estado = new Estado();
+        estado.setIdEstado(2);
+        productoI.setEstado(estado);
+
+        this.productoInventarioDao.save(productoI);
+
+        response = new ResponseDto();
+        response.setRespuesta(ResourceUtil.productoInvetarioInactivo);
+        response.setValor(productoI.getConsecutivo());
+
+        return response;
+    }
+
+    public ResponseDto validarDtoGuardado(ProductoInventarioDto productoInventario, int tipoSolicitud){
         Date fechaActual;
         Date fechaCaduca = ResourceUtil.convertitFechaStringaDate(productoInventario.getFechaCaduca());
 
@@ -77,7 +139,11 @@ public class ProductoInventarioServiceImpl implements ProductoInventarioService 
             return ResponseDto.builder().respuesta(ResourceUtil.notFechaCaducaProductoInventario).valor(0).build();
         }
 
-        if(productoInventario.getCantidad() <= 0){
+        if(productoInventario.getCantidad() <= 0 && tipoSolicitud == 1){
+            return ResponseDto.builder().respuesta(ResourceUtil.notCantidadProductoInventario).valor(0).build();
+        }
+
+        if(productoInventario.getCantidad() < 0 && tipoSolicitud == 2){
             return ResponseDto.builder().respuesta(ResourceUtil.notCantidadProductoInventario).valor(0).build();
         }
 

@@ -14,4 +14,5 @@ public class ProductoInventarioDto {
     private String fechaCaduca;
     private int cantidad;
     private int idProducto;
+    private int consecutivo;
 }

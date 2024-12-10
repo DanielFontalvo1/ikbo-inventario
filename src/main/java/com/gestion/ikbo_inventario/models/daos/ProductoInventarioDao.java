@@ -24,7 +24,12 @@ public interface ProductoInventarioDao extends CrudRepository<ProductoInventario
            inner join productos p on p.id_producto = pi.producto
            inner join estados e on e.id_estado = pi.estado
         where ('%' = ?1 or p.nombre_producto = ?1)
+          and  pi.estado = 1
+        ORDER BY pi.fecha_caduca ASC;
     """)
     Page<ProductoInvetarioRDto> listarProductosInventario(String nombreProducto, Pageable page);
+
+    @Query("select p from ProductoInventario p where p.producto.idProducto = ?1 and p.consecutivo = ?2")
+    ProductoInventario getProductoInventarioByProducto_IdProductoAndConsecutivo(int idProducto, int consecutivo);
 
 }
